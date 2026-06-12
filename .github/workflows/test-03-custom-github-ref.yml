@@ -1,0 +1,10 @@
+name: "test-03 custom-github-ref"
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions@docs/readme-improvements
+        with:
+          custom-github-ref: "main"
+      - run: snow --version

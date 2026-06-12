@@ -1,0 +1,10 @@
+name: "test-02 cli-version input"
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions@docs/readme-improvements
+        with:
+          cli-version: "3.19.0"
+      - run: snow --version | grep "3.19.0"

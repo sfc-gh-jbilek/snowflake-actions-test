@@ -1,0 +1,11 @@
+name: "test-04 mutual exclusion error"
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions@docs/readme-improvements
+        with:
+          cli-version: "3.19.0"
+          custom-github-ref: "main"
+      - run: echo "Should not reach here"

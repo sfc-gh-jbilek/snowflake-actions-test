@@ -1,0 +1,8 @@
+name: "test-01 basic install"
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions@docs/readme-improvements
+      - run: snow --version
