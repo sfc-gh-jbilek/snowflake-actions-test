@@ -4,8 +4,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: snowflakedb/snowflake-actions@docs/readme-improvements
+      - id: mutual-exclusion
+        continue-on-error: true
+        uses: snowflakedb/snowflake-actions@docs/readme-improvements
         with:
           cli-version: "3.19.0"
           custom-github-ref: "main"
-      - run: echo "Should not reach here"
+
+      - name: Assert action failed (mutual exclusion enforced)
+        run: |
+          if [ "${{ steps.mutual-exclusion.outcome }}" != "failure" ]; then
+            echo "Expected failure due to mutual exclusion, but outcome was: ${{ steps.mutual-exclusion.outcome }}"
+            exit 1
+          fi
+          echo "OK: action correctly rejected both inputs"
