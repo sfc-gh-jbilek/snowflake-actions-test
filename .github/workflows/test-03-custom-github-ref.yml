@@ -4,7 +4,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: snowflakedb/snowflake-actions@docs/readme-improvements
+      - uses: snowflakedb/snowflake-actions@main
         with:
           custom-github-ref: "main"
       - run: snow --version

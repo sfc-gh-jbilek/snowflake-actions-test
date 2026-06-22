@@ -4,7 +4,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: snowflakedb/snowflake-actions@docs/readme-improvements
+      - uses: snowflakedb/snowflake-actions@main
         with:
           cli-version: "3.19.0"
       - run: snow --version | grep "3.19.0"

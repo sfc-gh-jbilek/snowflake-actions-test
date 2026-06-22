@@ -4,7 +4,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: snowflakedb/snowflake-actions@docs/readme-improvements
+      - uses: snowflakedb/snowflake-actions@main
       - env:
           SNOWFLAKE_AUTHENTICATOR: SNOWFLAKE_JWT
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}

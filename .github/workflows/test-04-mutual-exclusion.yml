@@ -6,7 +6,7 @@ jobs:
     steps:
       - id: mutual-exclusion
         continue-on-error: true
-        uses: snowflakedb/snowflake-actions@docs/readme-improvements
+        uses: snowflakedb/snowflake-actions@main
         with:
           cli-version: "3.19.0"
           custom-github-ref: "main"
