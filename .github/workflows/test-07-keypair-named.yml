@@ -2,7 +2,6 @@ name: "test-07 key pair named connection"
 on:
   push:
   workflow_call:
-    secrets: inherit
 jobs:
   test:
     runs-on: ubuntu-latest

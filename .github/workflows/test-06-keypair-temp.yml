@@ -2,7 +2,6 @@ name: "test-06 key pair temporary connection"
 on:
   push:
   workflow_call:
-    secrets: inherit
 jobs:
   test:
     runs-on: ubuntu-latest
