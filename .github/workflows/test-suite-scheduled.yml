@@ -22,7 +22,7 @@ jobs:
     steps:
       - id: latest
         run: |
-          VERSION=$(curl -s https://pypi.org/pypi/snowflake-cli-labs/json | jq -r '.info.version')
+          VERSION=$(curl -s https://pypi.org/pypi/snowflake-cli/json | jq -r '.info.version')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - uses: snowflakedb/snowflake-actions@main
         with:
