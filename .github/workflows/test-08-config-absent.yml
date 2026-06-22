@@ -1,5 +1,7 @@
 name: "test-08 config absent silent skip"
-on: push
+on:
+  push:
+  workflow_call:
 jobs:
   test:
     runs-on: ubuntu-latest

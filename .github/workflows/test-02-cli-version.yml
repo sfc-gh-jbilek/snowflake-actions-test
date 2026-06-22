@@ -1,5 +1,7 @@
 name: "test-02 cli-version input"
-on: push
+on:
+  push:
+  workflow_call:
 jobs:
   test:
     runs-on: ubuntu-latest

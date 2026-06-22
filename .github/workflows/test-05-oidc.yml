@@ -1,5 +1,8 @@
 name: "test-05 OIDC auth"
-on: push
+on:
+  push:
+  workflow_call:
+    secrets: inherit
 permissions:
   id-token: write
   contents: read
