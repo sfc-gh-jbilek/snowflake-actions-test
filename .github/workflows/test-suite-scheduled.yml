@@ -28,3 +28,6 @@ jobs:
     uses: ./.github/workflows/test-09-snowflake-cli-subaction.yml
   test-10:
     uses: ./.github/workflows/test-10-cortex-code-subaction.yml
+  test-11:
+    uses: ./.github/workflows/test-11-cortex-exec.yml
+    secrets: inherit
