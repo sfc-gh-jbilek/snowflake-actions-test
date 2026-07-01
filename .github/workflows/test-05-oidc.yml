@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: snowflakedb/snowflake-actions@main
+      - uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
         with:
           use-oidc: "true"
       - env:

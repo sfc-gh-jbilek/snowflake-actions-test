@@ -24,3 +24,7 @@ jobs:
     secrets: inherit
   test-08:
     uses: ./.github/workflows/test-08-config-absent.yml
+  test-09:
+    uses: ./.github/workflows/test-09-snowflake-cli-subaction.yml
+  test-10:
+    uses: ./.github/workflows/test-10-cortex-code-subaction.yml

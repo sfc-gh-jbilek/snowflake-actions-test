@@ -8,7 +8,7 @@ jobs:
     steps:
       - id: mutual-exclusion
         continue-on-error: true
-        uses: snowflakedb/snowflake-actions@main
+        uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
         with:
           cli-version: "3.19.0"
           custom-github-ref: "main"
