@@ -181,7 +181,7 @@ jobs:
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER_CORTEX }}
       - name: Run a prompt and verify response
         run: |
-          OUTPUT=$(cortex exec -c default --format json --max-turns 2 --bypass \
+          OUTPUT=$(cortex exec -c default --output-format stream-json --max-turns 2 --bypass \
             "Run this SQL and tell me the result: SELECT CURRENT_USER() AS WHO")
           echo "$OUTPUT"
           [[ -n "$OUTPUT" ]] || { echo "::error::Empty response from cortex exec"; exit 1; }
