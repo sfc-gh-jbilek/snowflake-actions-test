@@ -1,0 +1,188 @@
+name: "test-suite"
+on:
+  push:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  test-01-basic-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
+      - run: snow --version
+
+  test-02-cli-version:
+    runs-on: ubuntu-latest
+    steps:
+      - id: latest
+        run: |
+          VERSION=$(curl -s https://pypi.org/pypi/snowflake-cli/json | jq -r '.info.version')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
+        with:
+          cli-version: ${{ steps.latest.outputs.version }}
+      - run: snow --version | grep "${{ steps.latest.outputs.version }}"
+
+  test-03-custom-github-ref:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
+        with:
+          custom-github-ref: "main"
+      - run: snow --version
+
+  test-04-mutual-exclusion:
+    runs-on: ubuntu-latest
+    steps:
+      - id: mutual-exclusion
+        continue-on-error: true
+        uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
+        with:
+          cli-version: "3.19.0"
+          custom-github-ref: "main"
+      - name: Assert action failed (mutual exclusion enforced)
+        run: |
+          if [ "${{ steps.mutual-exclusion.outcome }}" != "failure" ]; then
+            echo "Expected failure due to mutual exclusion, but outcome was: ${{ steps.mutual-exclusion.outcome }}"
+            exit 1
+          fi
+          echo "OK: action correctly rejected both inputs"
+
+  test-05-oidc:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
+        with:
+          use-oidc: "true"
+      - env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+        run: snow connection test -x
+
+  test-06-keypair-temp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
+      - env:
+          SNOWFLAKE_AUTHENTICATOR: SNOWFLAKE_JWT
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER_KP }}
+          SNOWFLAKE_PRIVATE_KEY_RAW: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_RAW }}
+        run: snow connection test -x
+
+  test-07-keypair-named:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
+        with:
+          default-config-file-path: "config.toml"
+      - env:
+          SNOWFLAKE_CONNECTIONS_MYCONNECTION_AUTHENTICATOR: SNOWFLAKE_JWT
+          SNOWFLAKE_CONNECTIONS_MYCONNECTION_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_CONNECTIONS_MYCONNECTION_USER: ${{ secrets.SNOWFLAKE_USER_KP }}
+          SNOWFLAKE_CONNECTIONS_MYCONNECTION_PRIVATE_KEY_RAW: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_RAW }}
+        run: snow connection test
+
+  test-08-config-absent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions@feat/modular-install-cli-cortex
+      - run: snow --version
+
+  test-09-cli-basic-install:
+    name: "test-09 snowflake-cli sub-action / basic install"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions/snowflake-cli@feat/modular-install-cli-cortex
+      - run: snow --version
+
+  test-09-cli-version:
+    name: "test-09 snowflake-cli sub-action / cli-version input"
+    runs-on: ubuntu-latest
+    steps:
+      - id: latest
+        run: |
+          VERSION=$(curl -s https://pypi.org/pypi/snowflake-cli/json | jq -r '.info.version')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - uses: snowflakedb/snowflake-actions/snowflake-cli@feat/modular-install-cli-cortex
+        with:
+          cli-version: ${{ steps.latest.outputs.version }}
+      - run: snow --version | grep "${{ steps.latest.outputs.version }}"
+
+  test-09-cli-mutual-exclusion:
+    name: "test-09 snowflake-cli sub-action / mutual exclusion error"
+    runs-on: ubuntu-latest
+    steps:
+      - id: check
+        continue-on-error: true
+        uses: snowflakedb/snowflake-actions/snowflake-cli@feat/modular-install-cli-cortex
+        with:
+          cli-version: "3.19.0"
+          custom-github-ref: "main"
+      - name: Assert action failed (mutual exclusion enforced)
+        run: |
+          if [ "${{ steps.check.outcome }}" != "failure" ]; then
+            echo "Expected failure due to mutual exclusion, but outcome was: ${{ steps.check.outcome }}"
+            exit 1
+          fi
+          echo "OK: sub-action correctly rejected both inputs"
+
+  test-10-cortex-install-only:
+    name: "test-10 cortex-code sub-action / install only (no connection)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions/cortex-code@feat/modular-install-cli-cortex
+      - run: cortex --version
+
+  test-10-cortex-beta-channel:
+    name: "test-10 cortex-code sub-action / beta channel install"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snowflakedb/snowflake-actions/cortex-code@feat/modular-install-cli-cortex
+        with:
+          cli-channel: "beta"
+      - run: cortex --version
+
+  test-10-cortex-invalid-channel:
+    name: "test-10 cortex-code sub-action / invalid channel is rejected"
+    runs-on: ubuntu-latest
+    steps:
+      - id: check
+        continue-on-error: true
+        uses: snowflakedb/snowflake-actions/cortex-code@feat/modular-install-cli-cortex
+        with:
+          cli-channel: "nightly"
+      - name: Assert action failed (invalid channel rejected)
+        run: |
+          if [ "${{ steps.check.outcome }}" != "failure" ]; then
+            echo "Expected failure for invalid channel, but outcome was: ${{ steps.check.outcome }}"
+            exit 1
+          fi
+          echo "OK: sub-action correctly rejected invalid channel"
+
+  test-11-cortex-exec:
+    name: "test-11 cortex exec (OIDC + prompt)"
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: snowflakedb/snowflake-actions/cortex-code@feat/modular-install-cli-cortex
+        with:
+          use-oidc: "true"
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT_CORTEX }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER_CORTEX }}
+      - name: Run a prompt and verify response
+        run: |
+          OUTPUT=$(cortex exec -c default --format json --max-turns 2 --bypass \
+            "Run this SQL and tell me the result: SELECT CURRENT_USER() AS WHO")
+          echo "$OUTPUT"
+          [[ -n "$OUTPUT" ]] || { echo "::error::Empty response from cortex exec"; exit 1; }
+          echo "PASS: cortex exec returned a response"
